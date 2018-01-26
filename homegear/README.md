@@ -1,34 +1,58 @@
-Personal Docker image of the official Homegear Docker image. It is based on Debian 9 (Stretch) and recreated with every new release.
+# Homegear
 
-# Supported Tags
-homegear, homegear-latest
-Configuration Files and Database
-The following directories can be loaded from the host to keep the data and configuration files out of the container:
+Das ist eine Kopie von der offiziellen Homegear Docker Image. Basierend auf Debian 9 (Stretch)
 
-/etc/homegear
-/var/lib/homegear
-/var/log/homegear
-# Usage
-To run the stable version of Homegear, execute the following commands.
+## Unterstütze Tags
 
-Create the data and log directories:
+* *homegear, homegear-latest*
 
- mkdir -p /homegear-data/etc
- mkdir /homegear-data/lib
- mkdir /homegear-data/log
-Start Homegear using those directories and exposing ports 2001 to 2003. The name of the container is set to homegear:
+## Konfigurationsdateien und Datenbank
+Folgende Ordner können vom Host geladen werden um die Konfigurationsdateien außerhalb vom Container zu speichern:
 
- docker run -d --rm -v /homegear-data/etc:/etc/homegear:Z -v /homegear-data/lib:/var/lib/homegear:Z -v /homegear-data/log:/var/log/homegear:Z -p 2001:2001 -p 2002:2002 -p 2003:2003 --name homegear homegear/homegear:stable
-To enter Homegear's CLI execute:
+* */etc/homegear*
+* */var/lib/homegear*
+* */var/log/homegear*
 
- docker exec -it homegear homegear -r
+## Verwendung
+
+Um eine stabile Version von Homegear laufen zu lassen, führen wir folgende Befehle aus:
+
+1. Erstellen der Daten- und Logordner:
+```mkdir -p /homegear-data/etc```
+```mkdir /homegear-data/lib```
+```mkdir /homegear-data/log```
+2. Start Homegear using those directories and exposing ports 2001 to 2003. The name of the container is set to homegear:
+```docker run -d --rm -v /homegear-data/etc:/etc/homegear:Z -v /homegear-data/lib:/var/lib/homegear:Z -v /homegear-data/log:/var/log/homegear:Z -p 2001:2001 -p 2002:2002 -p 2003:2003 --name homegear psycho0verload/armv7hf-lib:homegear-latest```
+3. To enter Homegear's CLI execute:
+```docker exec -it homegear homegear -r```
 To run a PHP command within Homegear's script engine, use:
-
- docker exec -it homegear homegear -e rc 'print $hg->getVersion();'
+```docker exec -it homegear homegear -e rc 'print $hg->getVersion();'```
 To execute a script in the scripts directory:
+```docker exec -it homegear homegear -e rs MyScript.php```
 
- docker exec -it homegear homegear -e rs MyScript.php
-# Additional Options
-If you want to expose host devices to Homegear use the --device option. E. g. to expose /dev/ttyUSB0:
+## Docker-Compose
 
-docker run -d --rm -v /homegear-data/etc:/etc/homegear:Z -v /homegear-data/lib:/var/lib/homegear:Z -v /homegear-data/log:/var/log/homegear:Z -p 2001:2001 -p 2002:2002 -p 2003:2003 --device=/dev/ttyUSB0 --name homegear homegear/homegear:stable
+Mein persönliches docker-compose.yml:
+
+```
+version: '2.2'
+services:
+  homegear:
+    container_name: Homegear
+    image: psycho0verload/armv7hf-lib:homegear-latest
+    restart: always
+    ports:
+      - 2001-2003:2001-2003
+    volumes:
+      - /opt/Homegear/etc:/etc/homegear:Z
+      - /opt/Homegear/lib:/var/lib/homegear:Z
+      - /opt/Homegear/log:/var/log/homegear:Z
+    devices:
+      - /dev/ttyAMA0:/dev/ttyAMA0
+```
+
+## Additional Options
+
+If you want to expose host devices to Homegear use the ```--device``` option. E. g. to expose ```/dev/ttyUSB0```:
+
+```docker run -d --rm -v /homegear-data/etc:/etc/homegear:Z -v /homegear-data/lib:/var/lib/homegear:Z -v /homegear-data/log:/var/log/homegear:Z -p 2001:2001 -p 2002:2002 -p 2003:2003 --device=/dev/ttyUSB0 --name homegear psycho0verload/armv7hf-lib:homegear-latest```
